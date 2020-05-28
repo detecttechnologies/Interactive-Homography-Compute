@@ -2,7 +2,7 @@
 An interactive UI to undertake perspective/homography transformations
 The code needs to be run with a command:     ***python Calibrate_homography.py***
 
-
+Install all the pip install required for the code:  ***pip install -r Requirements.txt***
 
 Stages in the ui that needs to be followed after running the script:
 
@@ -16,6 +16,6 @@ Event: Right mouse double click to mark the points in the frame. (Left mouse cli
 3)**Giving clibration scale.**
 Give the height and width scale of the rectangles as integers and press the calibrate button after it.
 
-4)After the matlabplots window is opened, any of the three buttons can be pressed to revisit and any of the three windows. The .npz will be save in the same directory of the code on clicking the Save button.
+4)After the matlabplot's window is opened, any of the three buttons can be pressed to revisit and any of the three windows. The .npz will be save in the same directory of the code on clicking the Save button.
 
 
