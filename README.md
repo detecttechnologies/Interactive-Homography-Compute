@@ -1,6 +1,6 @@
 # Interactive-Homography-Compute
 An interactive UI to undertake perspective/homography transformations
-The code needs to be run with a command:     python Calibrate_homography.py
+The code needs to be run with a command:     ***python Calibrate_homography.py***
 
 Stages in the ui that needs to be followed:
 
