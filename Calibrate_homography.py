@@ -1,24 +1,20 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'homography_frame.ui'
-#
-# Created by: PyQt5 UI code generator 5.13.0
-#
-# WARNING! All changes made in this file will be lost!
+import math
+import os
+import sys
+from pathlib import Path
 
-
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QFileDialog
-import numpy as np
 import cv2 as cv
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.widgets import Button
-from pathlib import Path
-import os
-import math
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QFileDialog
 
 
-class Ui_MainWindow(object):                                                                             ###############UI  creation using pyqt5
+# UI creation using pyqt5
+class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(500, 300)
@@ -67,22 +63,24 @@ class Ui_MainWindow(object):                                                    
         self.uploadButton.setText(_translate("MainWindow", "Upload"))
         self.label.setText(_translate("MainWindow", "Upload Video:"))
 
-    def uploadvideo(self):                                                                               ###############Upload button function to upload the video
-        self.filename = QFileDialog.getOpenFileName(None, 'Open file',
-                                                    os.getcwd(), "Video files (*.mp4)")
+    def uploadvideo(self):
+        """Upload button function to upload the video"""
+        self.filename = QFileDialog.getOpenFileName(
+            None, "Open file", os.getcwd(), "Video files (*.mp4)"
+        )
         MainWindow.hide()
         points = []
         self.homography_frame(self.filename, points)
 
-    def homography_frame(self, filename, points):                                                        ###############Video frame to capture the points(marking and altering)             
+    def homography_frame(self, filename, points, mark_dims=True):
+        """Video frame to capture the points(marking and altering)"""
         cap = cv.VideoCapture(filename[0])
         ret = False
         while not ret:
             ret, frame = cap.read()
         staticframe = frame.copy()
-        if len(points) != 0:
-            for i in points:
-                cv.circle(frame, (i[0], i[1]), 8, (200, 0, 0), -1)
+        for i in points:
+            cv.circle(frame, (i[0], i[1]), 8, (200, 0, 0), -1)
         frame_OG = frame.copy()
 
         def get_calibration_points():
@@ -92,44 +90,69 @@ class Ui_MainWindow(object):                                                    
             def get_rect(event, x, y, flags, refPt):
                 distance_dict = {}
                 d = []
-                if event == cv.EVENT_RBUTTONDBLCLK:                                                      ##Double click the right side of the mouse to mark the points
-                    refPt.append([x, y])
-                    centre = (x, y)
-                    cv.circle(frame, centre, 8, (200, 0, 0), -1)                                         ###############Marking the frames with circular points                 
-                    cv.imshow('Select your points', frame)                                               
-                elif event == cv.EVENT_LBUTTONDBLCLK:                                                    ##Double click the left side of the mouse to delete the points
-                    frame_new = staticframe.copy()
-                    try:
-                        for pt in refPt:                                                                ################Points need to be marked in the rectangular shape(4 points only)
-                            distance = math.sqrt((x - pt[0]) ** 2 + (y - pt[1]) ** 2)
-                            d.append(distance)
-                            distance_dict[distance] = pt
-                        minimum_ditance = min(d)
-                        if len(refPt) != 0:
-                            refPt.remove(distance_dict.get(minimum_ditance))                              ###############Deleting the positional points from the reference points matrix to delete the points marked in the ui
-                    except:
-                        pass
-                    for pt in refPt:
-                        cv.circle(frame_new, (pt[0], pt[1]), 8, (200, 0, 0), -1)
-                    cv.addWeighted(frame, 0.0, frame_new, 1, 0, frame)
-                    cv.imshow('Select your points', frame)
+                # Use the left side of the mouse to mark the points
+                if event == cv.EVENT_LBUTTONDOWN:
+                    if flags == cv.EVENT_FLAG_LBUTTON:
+                        refPt.append([x, y])
+                        centre = (x, y)
+                        # Marking the frames with circular points
+                        cv.circle(frame, centre, 8, (200, 0, 0), -1)
+                        cv.imshow("Select your points", frame)
+                    elif flags == cv.EVENT_FLAG_CTRLKEY + cv.EVENT_FLAG_LBUTTON:
+                        # Use CTRL key + left mouse buttton to delete the points
+                        frame_new = staticframe.copy()
+                        try:
+                            for pt in refPt:
+                                # Points need to be marked in the rectangular shape(4 points only)
+                                distance = math.sqrt(
+                                    (x - pt[0]) ** 2 + (y - pt[1]) ** 2
+                                )
+                                d.append(distance)
+                                distance_dict[distance] = pt
+                            minimum_ditance = min(d)
+                            if len(refPt) != 0:
+                                # Deleting positional points from refPt deletes the points marked in the ui
+                                refPt.remove(distance_dict.get(minimum_ditance))
+                        except:
+                            pass
+                        for pt in refPt:
+                            cv.circle(frame_new, (pt[0], pt[1]), 8, (200, 0, 0), -1)
+                        cv.addWeighted(frame, 0.0, frame_new, 1, 0, frame)
+                        cv.imshow("Select your points", frame)
 
-            cv.namedWindow('Select your points', 0)
+            cv.namedWindow("Select your points", 0)
             frame = frame_OG.copy()
-            cv.putText(frame, text="Start from top left point, go clockwise", org=(10, 50),
-                       fontFace=cv.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(0, 125, 0), thickness=2)
-            cv.imshow('Select your points', frame)
-            cv.setMouseCallback('Select your points', get_rect, refPt)
+            cv.putText(
+                frame,
+                text="Start from top left point, go clockwise",
+                org=(10, 50),
+                fontFace=cv.FONT_HERSHEY_SIMPLEX,
+                fontScale=0.5,
+                color=(0, 125, 0),
+                thickness=2,
+            )
+            cv.putText(
+                frame,
+                text="Click to place a point, Ctrl+Click to remove",
+                org=(10, 100),
+                fontFace=cv.FONT_HERSHEY_SIMPLEX,
+                fontScale=0.5,
+                color=(0, 125, 0),
+                thickness=2,
+            )
+            cv.imshow("Select your points", frame)
+            cv.setMouseCallback("Select your points", get_rect, refPt)
             cv.waitKey()
             return refPt
 
         self.calibration_points = get_calibration_points()
         self.pts1 = np.array(self.calibration_points, dtype=np.float32)
         print(f"First set of points: {self.pts1}")
-        self.rectanglewindow(event=True)
+        self.rectanglewindow(event=True, mark_dims=mark_dims)
 
-    def rectanglewindow(self, event):                                                                    ###############Ui window to get the scale for the rectangle we have plotted using(Height and width to b mentioned in integers)
-        plt.close(fig=None)
+    def rectanglewindow(self, event, mark_dims=True):
+        """Ui window to get the scale for the rectangle we have plotted using(Height and width to b mentioned in integers)"""
+        # plt.close(fig=None)
         dlg = QtWidgets.QDialog(None)
         dlg.setWindowTitle("Rectangle width and height")
         self.width = QtWidgets.QLineEdit(dlg)
@@ -172,51 +195,62 @@ class Ui_MainWindow(object):                                                    
         self.Calibratebutton.setFont(font)
         self.Calibratebutton.clicked.connect(dlg.hide)
         dlg.exec_()
-        transformed_width = int(self.width.text())
-        transformed_height = int(self.height.text())
-        # %%
+        if mark_dims:
+            try:
+                self.transformed_width = int(self.width.text())
+                self.transformed_height = int(self.height.text())
+            except ValueError:
+                raise SystemError("Should pass a number as width and height")
+
         top_left = np.array((500, 500))
-        pts2 = np.float32([top_left + [0, 0],
-                           top_left + [transformed_width, 0],
-                           top_left + [transformed_width, transformed_height],
-                           top_left + [0, transformed_height]])
+        pts2 = np.float32(
+            [
+                top_left + [0, 0],
+                top_left + [self.transformed_width, 0],
+                top_left + [self.transformed_width, self.transformed_height],
+                top_left + [0, self.transformed_height],
+            ]
+        )
 
         self.M = cv.getPerspectiveTransform(self.pts1, pts2)
-        dst = cv.warpPerspective(frame, self.M, (frame.shape[1] * 2, frame.shape[0] * 2))
+        dst = cv.warpPerspective(
+            frame, self.M, (frame.shape[1] * 2, frame.shape[0] * 2)
+        )
         plt.figure(figsize=(10, 5))
-        plt.subplot(121), plt.imshow(frame[..., ::-1]), plt.title('Input')
-        plt.subplot(122), plt.imshow(dst[..., ::-1]), plt.title('Output')
-        axrect = plt.axes([0.19, 0.05, 0.4, 0.075])                                                      ###############Plotting the matlabplots in the canvas
+        plt.ion()
+        plt.show()
+        plt.subplot(121), plt.imshow(frame[..., ::-1]), plt.title("Input")
+        plt.subplot(122), plt.imshow(dst[..., ::-1]), plt.title("Output")
+        axrect = plt.axes([0.19, 0.05, 0.4, 0.075])
         axprev = plt.axes([0.60, 0.05, 0.2, 0.075])
         axnext = plt.axes([0.81, 0.05, 0.1, 0.075])
-        bnext = Button(axnext, 'Save')
+        bnext = Button(axnext, "Save")
+        bprev = Button(axprev, "Mark Points Again!!")
+        rect = Button(axrect, "Change the height and width of the rectangle!!")
+        plt.draw()
         bnext.on_clicked(self.nextwindow)
-        bprev = Button(axprev, 'Mark Points Again!!')
         bprev.on_clicked(self.previouswindow)
-        rect = Button(axrect, 'Change the height and width of the rectangle!!')
         rect.on_clicked(self.rectanglewindow)
-        plt.show()
+        plt.pause(100.00)
 
     def nextwindow(self, event):
         plt.close(fig=None)
         print(self.M)
         inputfilename = Path(self.filename[0]).stem
-        matrix_file = 'calibration_' + inputfilename + '.npz'
+        matrix_file = "calibration_" + inputfilename + ".npz"
         self.M.dump(matrix_file)
         # self.uploadvideo()
         cv.destroyAllWindows()
         MainWindow.show()
 
-    def previouswindow(self, event):                                                                     ###############Clicking the Mark points again button to change the marked points to alter calibration
-        print("Previous button")
-        plt.close(fig=None)
-        self.homography_frame(self.filename, self.calibration_points)
+    def previouswindow(self, event):
+        """Clicking the Mark points again button to change the marked points to alter calibration"""
+        # plt.close(fig=None)
+        self.homography_frame(self.filename, self.calibration_points, mark_dims=False)
         return False
 
 
 if __name__ == "__main__":
-    import sys
-
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
