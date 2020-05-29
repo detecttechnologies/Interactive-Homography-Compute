@@ -4,6 +4,8 @@ The code needs to be run with a command:     ***python Calibrate_homography.py**
 
 Install all the pip install required for the code:  ***pip install -r Requirements.txt***
 
+Use the respective codes for the corresponding OSes
+
 Stages in the ui that needs to be followed after running the script:
 
 1)**Upload video**
@@ -11,7 +13,7 @@ Upload any video ny clicking the upload button.
 
 2)**Mark the points in the frame.** 
 Event: Right mouse double click to mark the points in the frame. (Left mouse click for linux os) 
-     : Left mouse double click to remove the marked points from the frame.(Ctrl+T for linux os). (# Dont use this when there is no points marked in the frame)
+     : Left mouse double click to remove the marked points from the frame.(Ctrl+ Left mouse button for linux os). (# Dont use this when there is no points marked in the frame)
         
 3)**Giving clibration scale.**
 Give the height and width scale of the rectangles as integers and press the calibrate button after it.
