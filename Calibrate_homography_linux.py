@@ -18,7 +18,7 @@ import os
 import math
 
 
-class Ui_MainWindow(object):  ###############UI  creation using pyqt5
+class Ui_MainWindow(object):                                                     ###############UI  creation using pyqt5
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(500, 300)
@@ -67,7 +67,7 @@ class Ui_MainWindow(object):  ###############UI  creation using pyqt5
         self.uploadButton.setText(_translate("MainWindow", "Upload"))
         self.label.setText(_translate("MainWindow", "Upload Video:"))
 
-    def uploadvideo(self):  ###############Upload button function to upload the video
+    def uploadvideo(self):                                                           ###############Upload button function to upload the video
         self.filename = QFileDialog.getOpenFileName(None, 'Open file',
                                                     os.getcwd(), "Video files (*.mp4)")
         MainWindow.hide()
@@ -75,7 +75,7 @@ class Ui_MainWindow(object):  ###############UI  creation using pyqt5
         self.homography_frame(self.filename, points)
 
     def homography_frame(self, filename,
-                         points):  ###############Video frame to capture the points(marking and altering)
+                         points):                                                     ###############Video frame to capture the points(marking and altering)
         cap = cv.VideoCapture(filename[0])
         ret = False
         while not ret:
@@ -93,24 +93,24 @@ class Ui_MainWindow(object):  ###############UI  creation using pyqt5
             def get_rect(event, x, y, flags, refPt):
                 distance_dict = {}
                 d = []
-                if event == cv.EVENT_LBUTTONUP:
+                if event == cv.EVENT_LBUTTONUP:                                        ##Use the left side of the mouse to mark the points
                     if flags == cv.EVENT_FLAG_LBUTTON:
                         refPt.append([x, y])
                         centre = (x, y)
                         cv.circle(frame, centre, 8, (200, 0, 0),
-                                  -1)  ###############Marking the frames with circular points
+                                  -1)                                                     ###############Marking the frames with circular points
                         cv.imshow('Select your points', frame)
-                    elif event == cv.EVENT_FLAG_CTRLKEY + cv.EVENT_FLAG_LBUTTON:
+                    elif event == cv.EVENT_FLAG_CTRLKEY + cv.EVENT_FLAG_LBUTTON:        ##Use CTRL key + left mouse buttton to delete the points
                         frame_new = staticframe.copy()
                         try:
-                            for pt in refPt:  ################Points need to be marked in the rectangular shape(4 points only)
+                            for pt in refPt:                                               ################Points need to be marked in the rectangular shape(4 points only)
                                 distance = math.sqrt((x - pt[0]) ** 2 + (y - pt[1]) ** 2)
                                 d.append(distance)
                                 distance_dict[distance] = pt
                             minimum_ditance = min(d)
                             if len(refPt) != 0:
                                 refPt.remove(distance_dict.get(
-                                    minimum_ditance))  ###############Deleting the positional points from the reference points matrix to delete the points marked in the ui
+                                    minimum_ditance))                                        ###############Deleting the positional points from the reference points matrix to delete the points marked in the ui
                         except:
                             pass
                         for pt in refPt:
@@ -133,7 +133,7 @@ class Ui_MainWindow(object):  ###############UI  creation using pyqt5
         self.rectanglewindow(event=True)
 
     def rectanglewindow(self,
-                        event):  ###############Ui window to get the scale for the rectangle we have plotted using(Height and width to b mentioned in integers)
+                        event):                                                                 ###############Ui window to get the scale for the rectangle we have plotted using(Height and width to b mentioned in integers)
         plt.close(fig=None)
         dlg = QtWidgets.QDialog(None)
         dlg.setWindowTitle("Rectangle width and height")
@@ -216,7 +216,7 @@ class Ui_MainWindow(object):  ###############UI  creation using pyqt5
         MainWindow.show()
 
     def previouswindow(self,
-                       event):  ###############Clicking the Mark points again button to change the marked points to alter calibration
+                       event):                                                              ###############Clicking the Mark points again button to change the marked points to alter calibration
         print("Previous button")
         plt.close(fig=None)
         self.homography_frame(self.filename, self.calibration_points)
