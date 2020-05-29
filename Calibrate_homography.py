@@ -92,12 +92,12 @@ class Ui_MainWindow(object):                                                    
             def get_rect(event, x, y, flags, refPt):
                 distance_dict = {}
                 d = []
-                if event == cv.EVENT_RBUTTONDBLCLK:
+                if event == cv.EVENT_RBUTTONDBLCLK:                                                      ##Double click the right side of the mouse to mark the points
                     refPt.append([x, y])
                     centre = (x, y)
                     cv.circle(frame, centre, 8, (200, 0, 0), -1)                                         ###############Marking the frames with circular points                 
-                    cv.imshow('Select your points', frame)                                             
-                elif event == cv.EVENT_LBUTTONDBLCLK:
+                    cv.imshow('Select your points', frame)                                               
+                elif event == cv.EVENT_LBUTTONDBLCLK:                                                    ##Double click the left side of the mouse to delete the points
                     frame_new = staticframe.copy()
                     try:
                         for pt in refPt:                                                                ################Points need to be marked in the rectangular shape(4 points only)
