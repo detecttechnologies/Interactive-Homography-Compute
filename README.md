@@ -16,7 +16,7 @@ Stages in the ui that needs to be followed after running the script:
 Upload any video ny clicking the upload button.
 
 2. **Mark the points in the frame**
-Left mouse double click to remove the marked points from the frame.(Ctrl+ Left mouse button for linux os). (# Dont use this when there is no points marked in the frame)
+Left click to add a point, and Ctrl+Left click to remove the nearest marked points from the frame
 
 3. **Giving clibration scale**
 Give the height and width scale of the rectangles as integers and press the calibrate button after it.
