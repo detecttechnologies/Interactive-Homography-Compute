@@ -29,6 +29,6 @@ Draw a rectangle with the mouse movement.
 5. **If MPC-Direction of entry option is selected**
 Same procedure to be followed as it, that was followed while drawing the line. We would be drawing an arrow instead of a line
 
-After the figures are drawn acoording to the option, pressing a save button, will enable us to write in an csv. If the options that are selected from the upload button are a non-csv option, the software creates a csvby itself called 'Camera Calibration details' and stores all the enteries for ther.
+After the figures are drawn acoording to the options selected, pressing a save button, will enable us to write in an csv. If the options that are selected from the upload button are a non-csv option, the software creates a csvby itself called 'Camera Calibration details' and stores all the enteries for ther.
 
 While loading an image in ui, we will find green lines already present, which indicate that the figures where marked there previously when the software was used.
